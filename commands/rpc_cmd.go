@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"net/rpc"
+  "net/rpc/jsonrpc"
 
 	command "github.com/daijinru/mango-packages-command"
 	mangoRPC "github.com/daijinru/mango-runner/rpc"
@@ -44,7 +45,7 @@ func NewServiceRpcStart() *command.Command {
           fmt.Printf("❌connect error: %s", err)
           continue
         }
-        go rpc.ServeConn(conn)
+        go jsonrpc.ServeConn(conn)
       }
     },
   }

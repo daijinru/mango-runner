@@ -1,7 +1,7 @@
 package main
 import (
   "fmt"
-  "net/rpc"
+  "net/rpc/jsonrpc"
 )
 type RunReqOption struct {
   Path string
@@ -21,7 +21,7 @@ type Reply struct {
   Data PipelineReply
 }
 func main() {
-  client, err := rpc.Dial("tcp", "localhost:1234")
+  client, err := jsonrpc.Dial("tcp", "localhost:1234")
   if err != nil {
     fmt.Println("无法连接到 RPC 服务:", err)
     return
@@ -33,9 +33,9 @@ func main() {
     Tag: "0c539af420a54f60a55f6d7a0c4be1ec",
     Filename: "0c539af420a54f60a55f6d7a0c4be1ec_20231014_010235.txt",
   }
-  // err = client.Call("CiService.CreatePipeline", reqOption, reply)
+  err = client.Call("CiService.CreatePipeline", reqOption, reply)
   // err = client.Call("CiService.ReadPipeline", reqOption, reply)
-  err = client.Call("CiService.ReadPipelineStatus", reqOption, reply)
+  // err = client.Call("CiService.ReadPipelineStatus", reqOption, reply)
   // err = client.Call("CiService.ReadPipelines", reqOption, reply)
   if err != nil {
     fmt.Println("call fail: ", err)

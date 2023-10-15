@@ -6,10 +6,6 @@ import (
 	"github.com/daijinru/mango-runner/utils"
 )
 
-var (
-  CI_LOCK_NAME = ".running.lock"
-)
-
 type CiService struct {
 }
 
