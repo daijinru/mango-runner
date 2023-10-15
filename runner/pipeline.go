@@ -11,7 +11,7 @@ import (
   "syscall"
   "time"
 
-  "github.com/daijinru/mango/mango-cli/utils"
+  "github.com/daijinru/mango-runner/utils"
 )
 
 type Pipeline struct {

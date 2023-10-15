@@ -2,8 +2,8 @@ package rpc
 
 import (
 	"fmt"
-	"github.com/daijinru/mango/mango-cli/runner"
-	"github.com/daijinru/mango/mango-cli/utils"
+	"github.com/daijinru/mango-runner/runner"
+	"github.com/daijinru/mango-runner/utils"
 )
 
 var (

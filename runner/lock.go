@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/daijinru/mango/mango-cli/utils"
+	"github.com/daijinru/mango-runner/utils"
 )
 
 var (

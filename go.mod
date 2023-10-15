@@ -1,4 +1,4 @@
-module github.com/daijinru/mango/mango-cli
+module github.com/daijinru/mango-runner
 
 go 1.18
 

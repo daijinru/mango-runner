@@ -6,7 +6,7 @@ import (
 	"net/rpc"
 
 	command "github.com/daijinru/mango-packages-command"
-	mangoRPC "github.com/daijinru/mango/mango-cli/rpc"
+	mangoRPC "github.com/daijinru/mango-runner/rpc"
 )
 
 func NewServiceRPC() *command.Command {

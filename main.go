@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	cmd "github.com/daijinru/mango/mango-cli/commands"
+	cmd "github.com/daijinru/mango-runner/commands"
 	"os"
 )
 

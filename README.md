@@ -4,8 +4,6 @@
 
 ```bash
 $ go build
-# or
-$ go build -o path/mango-cli
 ```
 ## Use Guider
 
