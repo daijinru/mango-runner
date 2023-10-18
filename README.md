@@ -1,10 +1,11 @@
-# Mango CLI
+# Mango Runner
 
 ## Build
 
 ```bash
 $ go build
 ```
+
 ## Use Guider
 
 Add it the content below to your `[project-root]/.mango/mango-ci.yaml`.
@@ -27,22 +28,9 @@ build-job:
 
 Execute at the command line.
 ```bash
-$ mango-cli rpc start 1234
+$ mango-cli serve start 1234
 ```
 
-### How to call by RPC
+### How to Test
 
-```go
-func main() {
-  client, err := rpc.Dial("tcp", "localhost:1234")
-  // ...
-  defer client.Close()
-  // ...
-  var reply = &Reply{}
-  // ...
-  err = client.Call("CiService.Run", reqOption, reply)
-  if err != nil {
-    fmt.Println("call fail: ", err)
-  }
-}
-```
+[Http Test](./http_test/README.md)
