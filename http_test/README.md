@@ -17,7 +17,7 @@ curl -X POST -d "path=/datas/mango-runner" -d "tag=0c539af420a54f60a55f6d7a0c4be
 
 pipeline console stdout:
 ```bash
-curl -X POST -d "path=/datas/mango-runner" -d "filename=0c539af420a54f60a55f6d7a0c4be1ec_20231017_235756.txt" http://localhost:1234/pipeline/stdout
+curl -X POST -d "path=/datas/mango-runner" -d "filename=d31bbd786bf44513a607060f303c35f8_20231021_010054.txt" http://localhost:1234/pipeline/stdout
 ```
 
 pipeline lsit:

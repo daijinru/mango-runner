@@ -53,35 +53,3 @@ func PathExists(path string) error {
   }
   return nil
 }
-
-// func (client *WorkspaceClient) ListDirectories(path string) ([]string, error) {
-//   var directories []string
-
-//   files, err := os.ReadDir(path)
-//   if err != nil {
-//     return nil, err
-//   }
-
-//   for _, file := range files {
-//     if file.IsDir() {
-//       directories = append(directories, file.Name())
-//     }
-//   }
-
-//   return directories, nil
-// }
-
-// func (client *WorkspaceClient) LsFiles(path string) ([]string, error) {
-//   var out []string
-
-//   files, err := os.ReadDir(path)
-//   if err != nil {
-//     return nil, err
-//   }
-
-//   for _, file := range files {
-//       out = append(out, file.Name())
-//   }
-
-//   return out, err
-// }
