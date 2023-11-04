@@ -21,7 +21,7 @@
 go.work
 
 # binary file
-mango-cli
+mango-runner
 
 # logs
 *.log

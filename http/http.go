@@ -2,19 +2,18 @@ package httpService
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/daijinru/mango-runner/runner"
-	"github.com/daijinru/mango-runner/utils"
 )
 
 type CiService struct {
 }
 
-func formatReplyMsg(runner *runner.Runner, msg string) string {
-  return fmt.Sprintf("[%s] [%s] 🥭 %s", utils.TimeNow(), runner.Pipeline.Filename, msg)
+type PipelineReply struct {
+  Status string `json:"status"`
+  Message string `json:"message"`
 }
 
 // Path parameter passing that service will switch to the path,
@@ -53,11 +52,20 @@ func (CiS *CiService) CreatePipeline(w http.ResponseWriter, r *http.Request) {
   go func() {
     err = runner.Create()
     if err != nil {
-      runner.Logger.Warn(err.Error())
+      runner.Logger.Warn(err.Error()) 
     }
   }()
 
-  fmt.Fprintf(w, "✔️ new pipeline was successfully launched!")
+  reply := PipelineReply{
+    Status: "success",
+    Message: runner.Pipeline.Filename,
+  }
+  jsonData, err := json.Marshal(reply)
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusBadRequest)
+  }
+  w.Header().Set("Content-Type", "application/json")
+  w.Write(jsonData)
 }
 
 // Whether the pipeline is running: query by pid and name locate the lock file at the path.
@@ -76,7 +84,17 @@ func (Cis *CiService) ReadPipelineStatus(w http.ResponseWriter, r *http.Request)
   if err != nil {
     runner.Logger.Warn(err.Error())
   }
-  fmt.Fprintf(w, strconv.FormatBool(running))
+
+  reply := PipelineReply{
+    Status: "success",
+    Message: strconv.FormatBool(running),
+  }
+  jsonData, err := json.Marshal(reply)
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusBadRequest)
+  }
+  w.Header().Set("Content-Type", "application/json")
+  w.Write(jsonData)
 }
 
 // Jobs tasks execution is output to a file, and its calling returns the contents of the file.
@@ -95,9 +113,17 @@ func (Cis *CiService) ReadPipeline(w http.ResponseWriter, r *http.Request) {
     http.Error(w, err.Error(), http.StatusBadRequest)
     return
   }
-  
-  content := pipeline.ReadFile(r.FormValue("filename"))
-  fmt.Fprintf(w, content)
+
+  reply := PipelineReply{
+    Status: "success",
+    Message: pipeline.ReadFile(r.FormValue("filename")),
+  }
+  jsonData, err := json.Marshal(reply)
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusBadRequest)
+  }
+  w.Header().Set("Content-Type", "application/json")
+  w.Write(jsonData)
 }
 
 type PipelinesReply struct {
@@ -139,5 +165,4 @@ func (Cis *CiService) ReadPipelines(w http.ResponseWriter, r *http.Request) {
   }
   w.Header().Set("Content-Type", "application/json")
   w.Write(jsonData)
-  return
 }
