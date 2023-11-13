@@ -23,15 +23,21 @@ func (ex *Execution) RunCommand(command string, args ...string) (string, error) 
 
   stdoutPipe, err := cmd.StdoutPipe()
   if err != nil {
-    message := fmt.Sprintf("failed to create execution: %s\n", err)
+    message := fmt.Sprintf("unable to get stdout pipe: %s\n", err)
+    ex.Pipeline.WriteError(err, combine)
+    return "", fmt.Errorf(message)
+  }
+
+  stderr, err := cmd.StderrPipe()
+  if err != nil {
+    message := fmt.Sprintf("unable to get stderr pipe: %s\n", err)
     ex.Pipeline.WriteError(err, combine)
     return "", fmt.Errorf(message)
   }
 
   if err := cmd.Start(); err != nil {
-    message := fmt.Sprintf("failed to start execution: %s\n", err)
+    message := fmt.Sprintf("unable to start execution: %s\n", err)
     ex.Pipeline.WriteError(err, combine)
-    // ex.Pipeline.AppendInfoLocally(message)
     return "", fmt.Errorf(message)
   }
 
@@ -47,6 +53,29 @@ func (ex *Execution) RunCommand(command string, args ...string) (string, error) 
       msg := fmt.Sprintf("[%s] %s", utils.TimeNow(), text)
       fmt.Println(chalk.White, msg)
     }
+  }
+  if err := scanner.Err(); err != nil {
+    message := fmt.Sprintf("error output while scanning stdout %s\n", err)
+    ex.Pipeline.WriteError(err, combine)
+    return "", fmt.Errorf(message)
+  }
+
+  scannerErr := bufio.NewScanner(stderr)
+  for scannerErr.Scan() {
+    text := scannerErr.Text()
+    output = text + "\n"
+    if ex.Pipeline != nil {
+      ex.Pipeline.WriteInfo(output)
+    }
+    if ex.PrintLine {
+      msg := fmt.Sprintf("[%s] %s", utils.TimeNow(), text)
+      fmt.Println(chalk.Red, msg)
+    }
+  }
+  if err := scannerErr.Err(); err != nil {
+    message := fmt.Sprintf("error output while scanning stderr %s\n", err)
+    ex.Pipeline.WriteError(err, combine)
+    return "", fmt.Errorf(message)
   }
 
   if err:= cmd.Wait(); err != nil {

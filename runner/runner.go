@@ -112,7 +112,7 @@ func (runner *Runner) Create() error {
         _, err := execution.RunCommandSplit(script.(string))
         if err != nil {
           runner.Logger.Warn(fmt.Sprintf("❌ has launched stage: [%s], but execution of ci script failed: %s", value.Stage, err))
-          runner.Logger.Warn(fmt.Sprintf("sorry 😅, the task was interrupted cause of error occured in stage: [%s], pipelind id: [%s]", value.Stage, runner.Pipeline.Tag))
+          runner.Logger.Warn(fmt.Sprintf("sorry 😅, the task was interrupted cause of error occured in stage: [%s], pipelind tag: [%s]", value.Stage, runner.Pipeline.Tag))
           break OuterLoop
         }
       }
