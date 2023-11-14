@@ -126,6 +126,19 @@ func (Cis *CiService) ReadPipeline(w http.ResponseWriter, r *http.Request) {
   w.Write(jsonData)
 }
 
+func (Cis *CiService) ReadServiceStatus(w http.ResponseWriter, r *http.Request) {
+  reply := PipelineReply{
+    Status: "success",
+    Message: "true",
+  }
+  jsonData, err := json.Marshal(reply)
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusBadRequest)
+  }
+  w.Header().Set("Content-Type", "application/json")
+  w.Write(jsonData)
+}
+
 type PipelinesReply struct {
   Total int `json:"total"`
   Filenames []string `json:"filenames"`

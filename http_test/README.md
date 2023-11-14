@@ -20,9 +20,13 @@ pipeline console stdout:
 curl -X POST -d "path=/datas/mango-runner" -d "filename=mango_20231113_231434.txt" http://localhost:1234/pipeline/stdout
 ```
 
-pipeline lsit:
+pipeline list:
 ```bash
 curl -X POST -d "path=/datas/mango-runner" -d "tag=mango" http://localhost:1234/pipeline/list
 ```
 
+Service status:
+```bash
+curl -X GET  http://localhost:1234/service/status
+```
 
