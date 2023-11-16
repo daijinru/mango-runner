@@ -27,6 +27,6 @@ curl -X POST -d "path=/datas/mango-runner" -d "tag=mango" http://localhost:1234/
 
 Service status:
 ```bash
-curl -X GET  http://localhost:1234/service/status
+curl -X POST http://localhost:1234/service/status
 ```
 

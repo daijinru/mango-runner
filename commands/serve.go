@@ -79,7 +79,7 @@ func NewServiceRpcStart() *command.Command {
 			})
 			handler5 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.Method {
-				case http.MethodGet:
+				case http.MethodPost:
 					ciService.ReadServiceStatus(w, r)
 				default:
 					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
