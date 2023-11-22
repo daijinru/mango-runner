@@ -79,7 +79,7 @@ func (ex *Execution) RunCommand(command string, args ...string) (string, error) 
   }
 
   if err:= cmd.Wait(); err != nil {
-    message := fmt.Sprintf("error occured from: %s", combine)
+    message := fmt.Sprintf("error occured: %s", combine)
     ex.Pipeline.WriteInfo(message + "\n")
     ex.Pipeline.WriteError(err, combine)
     return "", fmt.Errorf(message)

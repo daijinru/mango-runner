@@ -125,7 +125,7 @@ func (pip *Pipeline) WriteError(cause error, command string) error {
   if err != nil {
     return err
   }
-  errorMsg := fmt.Sprintf("[Failed] [Tag:%s] [Filename:%s] [Error:%s] [occured:%s]", pip.Tag, pip.Filename, cause.Error(), command)
+  errorMsg := fmt.Sprintf("[Failed] [Tag:%s] [Filename:%s] [Error:%s] [script:%s]", pip.Tag, pip.Filename, cause.Error(), command)
   _, err = file.WriteString(errorMsg)
 
   return err

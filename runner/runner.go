@@ -119,7 +119,11 @@ func (runner *Runner) Create() error {
     }
   }
 
+
+  runner.Pipeline.WriteInfo("🥭 running completed!")
+
   err = runner.Complete()
+
   if err != nil {
     return err
   }
