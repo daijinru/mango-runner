@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"syscall"
+  "time"
 )
 
 // The collections of CI methods, plz call NewCI() for initialization.
@@ -14,12 +15,14 @@ type Runner struct {
   Workspace *Workspace
   YamlReader *YamlReader
   Logger *Logger
+  Callback string
 }
 
 type RunnerArgs struct {
   // Local directory path, absolute or relative
   Path string
   Tag string
+  Callback string
 }
 
 // Initialize a CI instance.
@@ -53,6 +56,7 @@ func NewRunner(args *RunnerArgs) (*Runner, error) {
     Logger: logger,
     Pipeline: pipeline,
     Lock: NewLock(workspace.CWD),
+    Callback: args.Callback,
   }, nil
 }
 
@@ -119,9 +123,11 @@ func (runner *Runner) Create() error {
     }
   }
 
-
-  runner.Pipeline.WriteInfo("🥭 running completed!")
-
+  runner.Pipeline.WriteInfo("🥭 running completed!" + "\n")
+  err = runner.Pipeline.Callback(runner.Callback, "status", "1", "endTime", time.Now().Format("2006-01-02 15:04:05"))
+  if err != nil {
+    return err
+  }
   err = runner.Complete()
 
   if err != nil {

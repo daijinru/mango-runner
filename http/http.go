@@ -24,6 +24,7 @@ func (CiS *CiService) CreatePipeline(w http.ResponseWriter, r *http.Request) {
   runnerArgs := &runner.RunnerArgs{
     Path: r.FormValue("path"),
     Tag: r.FormValue("tag"),
+    Callback: r.FormValue("callbackUrl"),
   }
   runner, err := runner.NewRunner(runnerArgs)
   if err != nil {
