@@ -92,6 +92,8 @@ func (runner *Runner) ReadStatus() (bool, error) {
 }
 
 func (runner *Runner) Create() error {
+  startTime := time.Now().Format("2006-01-02 15:04:05")
+
   err := runner.YamlReader.Read()
   if err != nil {
     return err
@@ -106,6 +108,7 @@ func (runner *Runner) Create() error {
     PrintLine: true,
     Pipeline: runner.Pipeline,
   }
+  
   OuterLoop:
   for stage := runner.YamlReader.Stages.Front(); stage != nil; stage = stage.Next() {
     scripts := stage.Value
@@ -124,7 +127,12 @@ func (runner *Runner) Create() error {
   }
 
   runner.Pipeline.WriteInfo("🥭 running completed!" + "\n")
-  err = runner.Pipeline.Callback(runner.Callback, "status", "1", "endTime", time.Now().Format("2006-01-02 15:04:05"))
+  err = runner.Pipeline.Callback(
+    runner.Callback, 
+    "status", "1",
+    "endTime", time.Now().Format("2006-01-02 15:04:05"),
+    "startTime", startTime,
+  )
   if err != nil {
     return err
   }
