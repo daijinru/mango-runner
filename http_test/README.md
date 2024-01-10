@@ -10,11 +10,6 @@ create pipeline same tag:
 curl -X POST -d "path=/datas/mango-runner" -d "tag=mango" http://localhost:1234/pipeline/create
 ```
 
-pipeline status:
-```bash
-curl -X POST -d "path=/datas/mango-runner" -d "tag=mango" http://localhost:1234/pipeline/status
-```
-
 pipeline console stdout:
 ```bash
 curl -X POST -d "path=/datas/mango-runner" -d "filename=mango_20231113_231434.txt" http://localhost:1234/pipeline/stdout
@@ -25,7 +20,7 @@ pipeline list:
 curl -X POST -d "path=/datas/mango-runner" -d "tag=mango" http://localhost:1234/pipeline/list
 ```
 
-Service status:
+Is service healthy?
 ```bash
 curl -X POST http://localhost:1234/service/status
 ```

@@ -3,8 +3,6 @@ package httpService
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
-
 	"github.com/daijinru/mango-runner/runner"
 )
 
@@ -52,35 +50,6 @@ func (CiS *CiService) CreatePipeline(w http.ResponseWriter, r *http.Request) {
   reply := PipelineReply{
     Status: "success",
     Message: runner.Pipeline.Filename,
-  }
-  jsonData, err := json.Marshal(reply)
-  if err != nil {
-    http.Error(w, err.Error(), http.StatusBadRequest)
-  }
-  w.Header().Set("Content-Type", "application/json")
-  w.Write(jsonData)
-}
-
-// Whether the pipeline is running: query by pid and name locate the lock file at the path.
-func (Cis *CiService) ReadPipelineStatus(w http.ResponseWriter, r *http.Request) {
-  runnerArgs := &runner.RunnerArgs{
-    Path: r.FormValue("path"),
-    Tag: r.FormValue("tag"),
-  }
-  runner, err := runner.NewRunner(runnerArgs)
-  if err != nil {
-    http.Error(w, err.Error(), http.StatusBadRequest)
-    return
-  }
-
-  running, err := runner.Pipeline.ReadPipelineStatus(runner.Lock.FilePath)
-  if err != nil {
-    runner.Logger.Warn(err.Error())
-  }
-
-  reply := PipelineReply{
-    Status: "success",
-    Message: strconv.FormatBool(running),
   }
   jsonData, err := json.Marshal(reply)
   if err != nil {

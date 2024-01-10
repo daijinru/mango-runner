@@ -53,14 +53,6 @@ func NewServiceRpcStart() *command.Command {
 					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
 				}
 			})
-			handler2 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				switch r.Method {
-				case http.MethodPost:
-					ciService.ReadPipelineStatus(w, r)
-				default:
-					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
-				}
-			})
 			handler3 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.Method {
 				case http.MethodPost:
@@ -87,7 +79,6 @@ func NewServiceRpcStart() *command.Command {
 			})
 
 			http.Handle("/pipeline/create", loggingMiddleware(handler1))
-			http.Handle("/pipeline/status", loggingMiddleware(handler2))
 			http.Handle("/pipeline/stdout", loggingMiddleware(handler3))
 			http.Handle("/pipeline/list", loggingMiddleware(handler4))
 			http.Handle("/service/status", loggingMiddleware(handler5))
