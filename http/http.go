@@ -32,21 +32,12 @@ func (CiS *CiService) CreatePipeline(w http.ResponseWriter, r *http.Request) {
     return
   }
   
-  running, err := runner.ReadStatus()
+  err = runner.Lock.Lock()
   if err != nil {
     runner.Logger.Warn(err.Error())
-  }
-  if running {
     message := "🔒 ci is running, No further operations allowed until it ends"
     runner.Logger.Warn(message)
     http.Error(w, message, http.StatusLocked)
-    return
-  }
-
-  err = runner.Complete()
-  if err != nil {
-    runner.Logger.Warn(err.Error())
-    http.Error(w, err.Error(), http.StatusBadRequest)
     return
   }
 
@@ -55,6 +46,7 @@ func (CiS *CiService) CreatePipeline(w http.ResponseWriter, r *http.Request) {
     if err != nil {
       runner.Logger.Warn(err.Error()) 
     }
+    runner.Complete()
   }()
 
   reply := PipelineReply{

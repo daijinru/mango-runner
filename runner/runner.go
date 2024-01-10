@@ -2,9 +2,6 @@ package runner
 
 import (
 	"fmt"
-	"os"
-	"strconv"
-	"syscall"
   "time"
 )
 
@@ -62,44 +59,12 @@ func NewRunner(args *RunnerArgs) (*Runner, error) {
 
 type RunnerContent struct {
   Status bool
-  
-}
-func (runner *Runner) ReadStatus() (bool, error) {
-  _, err := os.Stat(runner.Lock.FilePath)
-  if err != nil && os.IsNotExist(err) {
-    return false, nil
-  }
-
-  lock, err := runner.Lock.Read()
-  if err != nil {
-    return false, err
-  }
-  
-  pid, err := strconv.Atoi(lock.PID)
-  if err != nil {
-    return false, err
-  }
-  process, err := os.FindProcess(pid)
-  if err != nil {
-    return false, err
-  }
-  err = process.Signal(syscall.Signal(0))
-  if err == nil {
-    return true, nil
-  }
-
-  return false, nil
 }
 
 func (runner *Runner) Create() error {
   startTime := time.Now().Format("2006-01-02 15:04:05")
 
   err := runner.YamlReader.Read()
-  if err != nil {
-    return err
-  }
-
-  err = runner.Lock.Write(runner.Pipeline.Tag)
   if err != nil {
     return err
   }
@@ -136,20 +101,12 @@ func (runner *Runner) Create() error {
   if err != nil {
     return err
   }
-  err = runner.Complete()
 
-  if err != nil {
-    return err
-  }
   return nil
 }
 
 func (runner *Runner) Complete() error {
-  _, err := os.Stat(runner.Lock.FilePath)
-  if err != nil && os.IsNotExist(err) {
-    return nil
-  }
-  err = runner.Lock.remove()
+  err := runner.Lock.Unlock()
   if err != nil {
     return err
   }
