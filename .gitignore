@@ -35,3 +35,7 @@ mango-runner
 # .mango
 .mango
 .mango/**/*
+
+# user private
+.private
+.private/**/*

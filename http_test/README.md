@@ -25,3 +25,8 @@ Is service healthy?
 curl -X POST http://localhost:1234/service/status
 ```
 
+Clone a project:
+```bash
+curl -X POST -d "name=<your_repo_name>" -d "repo=<your_repo>" -d "branch=<your_repo_branch_name>" -d "user=<your_username>" -d "pwd=<your_pwd>" http://localhost:1234/git/clone
+```
+

@@ -7,8 +7,8 @@ import (
 
 // Workspace It's the working directory client.
 type Workspace struct {
-	CWD  string `json:"Workspace"`
-	path string `json:"Path"`
+	CWD         string `json:"Workspace"`
+	ProjectRoot string `json:"ProjectRoot"`
 }
 
 // NewWorkSpace
@@ -35,8 +35,8 @@ func NewWorkSpace(path string) (*Workspace, error) {
 		return nil, err
 	}
 	return &Workspace{
-		CWD:  wd,
-		path: absPath,
+		CWD:         wd,
+		ProjectRoot: absPath,
 	}, nil
 }
 

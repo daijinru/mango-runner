@@ -2,7 +2,8 @@
 
 ## Todo
 
-- [ ] [061501] Provide a http call for cloning from the Git repo/branch. 
+- [x] [061501] Provide a http call for cloning from the Git repo/branch. 
+- [ ] [062101] Refactor methods basis on Git Clone.
 
 ## Build
 
