@@ -59,16 +59,18 @@ func (CiS *CiService) CreatePipeline(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonData)
 }
 
-// Jobs tasks execution is output to a file, and its calling returns the contents of the file.
+// ReadPipeline Jobs tasks execution is output to a file, and its calling returns the contents of the file.
 func (Cis *CiService) ReadPipeline(w http.ResponseWriter, r *http.Request) {
-	workspace, err := runner.NewWorkSpace(r.FormValue("path"))
+	name := r.FormValue("name")
+	workspace, err := runner.NewWorkSpace(name)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	pipeline, err := runner.NewPipeline(&runner.PipelineArgs{
-		// Tag: r.FormValue("tag"),
+		Tag:  name,
 		Path: workspace.CWD,
 	})
 	if err != nil {
