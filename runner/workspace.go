@@ -12,8 +12,8 @@ type Workspace struct {
 }
 
 // NewWorkSpace
-// The currently working directory should be the <home_dir>/mango/path/.mango,
-// path should be the project's name, and CWD will be as the mango working directory (/path/.mango).
+// The CWD should be <home_dir>/.mango/,
+// path should be the project's name, and ProjectRoot will be <home_dir>/mangoes/<project_name>.
 // Directory will be created if it doesn't exist.
 func NewWorkSpace(path string) (*Workspace, error) {
 	homeDir, err := os.UserHomeDir()
@@ -21,7 +21,7 @@ func NewWorkSpace(path string) (*Workspace, error) {
 		return nil, err
 	}
 
-	absPath := filepath.Join(homeDir, "mango", path)
+	absPath := filepath.Join(homeDir, "mangoes", path)
 	err = PathExists(absPath)
 	if err != nil {
 		err := MakePathExists(absPath)
@@ -30,12 +30,12 @@ func NewWorkSpace(path string) (*Workspace, error) {
 		}
 	}
 
-	wd, err := chWorkspace(filepath.Join(absPath, ".mango"))
+	cwd, err := chWorkspace(filepath.Join(homeDir, ".mango"))
 	if err != nil {
 		return nil, err
 	}
 	return &Workspace{
-		CWD:         wd,
+		CWD:         cwd,
 		ProjectRoot: absPath,
 	}, nil
 }

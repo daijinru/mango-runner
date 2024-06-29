@@ -20,9 +20,9 @@ type PipelineReply struct {
 func (CiS *CiService) CreatePipeline(w http.ResponseWriter, r *http.Request) {
 
 	runnerArgs := &runner.RunnerArgs{
-		Path:     r.FormValue("path"),
-		Tag:      r.FormValue("tag"),
-		Callback: r.FormValue("callbackUrl"),
+		Name:       r.FormValue("name"),
+		CommandStr: r.FormValue("command"),
+		Callback:   r.FormValue("callbackUrl"),
 	}
 	runner, err := runner.NewRunner(runnerArgs)
 	if err != nil {
@@ -107,7 +107,7 @@ type PipelinesReply struct {
 	Tag       string   `json:"tag"`
 }
 
-// Gets all pipeline files by the path passing.
+// ReadPipelines Gets all pipeline files by the path passing.
 func (Cis *CiService) ReadPipelines(w http.ResponseWriter, r *http.Request) {
 	workspace, err := runner.NewWorkSpace(r.FormValue("path"))
 	if err != nil {

@@ -2,114 +2,106 @@ package runner
 
 import (
 	"fmt"
-  "time"
+	"time"
 )
 
-// The collections of CI methods, plz call NewCI() for initialization.
+// Runner The collections of CI methods, plz call NewCI() for initialization.
 type Runner struct {
-  Pipeline *Pipeline
-  Lock *Lock
-  Workspace *Workspace
-  YamlReader *YamlReader
-  Logger *Logger
-  Callback string
+	Pipeline  *Pipeline
+	Lock      *Lock
+	Workspace *Workspace
+	Logger    *Logger
+	Execution *Execution
+	Callback  string
 }
 
 type RunnerArgs struct {
-  // Local directory path, absolute or relative
-  Path string
-  Tag string
-  Callback string
+	// Local directory path, absolute or relative
+	Name       string
+	CommandStr string
+	Callback   string
 }
 
-// Initialize a CI instance.
+// NewRunner Initialize a CI instance.
 func NewRunner(args *RunnerArgs) (*Runner, error) {
-  workspace, err := NewWorkSpace(args.Path)
-  if err != nil {
-    return nil, err
-  }
+	// CWD is forced to be the user root.
+	workspace, err := NewWorkSpace(args.Name)
+	if err != nil {
+		return nil, err
+	}
 
-  yamlReader, err := NewYamlReader(workspace.CWD)
-  if err != nil {
-    return nil, err
-  }
-  
-  logger, err := NewLogger(workspace.CWD)
-  if err != nil {
-    return nil, err
-  }
+	logger, err := NewLogger(workspace.CWD)
+	if err != nil {
+		return nil, err
+	}
 
-  pipeline, err := NewPipeline(&PipelineArgs{
-    Tag: args.Tag,
-    Path: workspace.CWD,
-  })
-  if err != nil {
-    return nil, err
-  }
+	pipeline, err := NewPipeline(&PipelineArgs{
+		Tag:  args.Name,
+		Path: workspace.CWD,
+	})
+	if err != nil {
+		return nil, err
+	}
 
-  return &Runner{
-    Workspace: workspace,
-    YamlReader: yamlReader,
-    Logger: logger,
-    Pipeline: pipeline,
-    Lock: NewLock(workspace.CWD),
-    Callback: args.Callback,
-  }, nil
+	execution := &Execution{
+		CommandStr: args.CommandStr,
+		PrintLine:  true,
+		Pipeline:   pipeline,
+	}
+
+	return &Runner{
+		Workspace: workspace,
+		Logger:    logger,
+		Pipeline:  pipeline,
+		Lock:      NewLock(workspace.CWD),
+		Execution: execution,
+		Callback:  args.Callback,
+	}, nil
 }
 
 type RunnerContent struct {
-  Status bool
+	Status bool
 }
 
 func (runner *Runner) Create() error {
-  startTime := time.Now().Format("2006-01-02 15:04:05")
+	startTime := time.Now().Format("2006-01-02 15:04:05")
 
-  err := runner.YamlReader.Read()
-  if err != nil {
-    return err
-  }
+	_, err := runner.Execution.RunCommandSplit()
+	if err != nil {
+		runner.Logger.Warn(fmt.Sprintf(
+			"❌ for command: [%s], but execution of ci script failed: %s",
+			runner.Execution.CommandStr, err))
+		runner.Logger.Warn(fmt.Sprintf(
+			"sorry 😅, the task was interrupted cause of error occured in command: [%s], pipelind tag: [%s]",
+			runner.Execution.CommandStr, runner.Pipeline.Tag))
+		return err
+	}
 
-  execution := &Execution{
-    PrintLine: true,
-    Pipeline: runner.Pipeline,
-  }
-  
-  OuterLoop:
-  for stage := runner.YamlReader.Stages.Front(); stage != nil; stage = stage.Next() {
-    scripts := stage.Value
-    if value, ok := scripts.(*Job); ok {
-      runner.Logger.Log("🎯 now running stage: " + value.Stage)
-      // fmt.Println(value)
-      for _, script := range value.Scripts {
-        _, err := execution.RunCommandSplit(script.(string))
-        if err != nil {
-          runner.Logger.Warn(fmt.Sprintf("❌ has launched stage: [%s], but execution of ci script failed: %s", value.Stage, err))
-          runner.Logger.Warn(fmt.Sprintf("sorry 😅, the task was interrupted cause of error occured in stage: [%s], pipelind tag: [%s]", value.Stage, runner.Pipeline.Tag))
-          break OuterLoop
-        }
-      }
-    }
-  }
+	err = runner.Pipeline.WriteInfo("🥭 running completed!" + "\n")
+	if err != nil {
+		runner.Logger.Warn(err.Error())
+		return err
+	}
 
-  runner.Pipeline.WriteInfo("🥭 running completed!" + "\n")
-  err = runner.Pipeline.Callback(
-    runner.Callback, 
-    "status", "1",
-    "endTime", time.Now().Format("2006-01-02 15:04:05"),
-    "startTime", startTime,
-  )
-  if err != nil {
-    return err
-  }
-
-  return nil
+	if runner.Callback != "" {
+		err = runner.Pipeline.Callback(
+			runner.Callback,
+			"status", "1",
+			"endTime", time.Now().Format("2006-01-02 15:04:05"),
+			"startTime", startTime,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (runner *Runner) Complete() error {
-  err := runner.Lock.Unlock()
-  if err != nil {
-    return err
-  }
-  defer runner.Pipeline.CloseFile()
-  return nil
+	err := runner.Lock.Unlock()
+	if err != nil {
+		return err
+	}
+	defer runner.Pipeline.CloseFile()
+	return nil
 }

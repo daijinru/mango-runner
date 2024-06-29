@@ -2,7 +2,7 @@
 
 cretea pipeline:
 ```bash
-curl -X POST -d "path=/datas/mango-runner" -d "tag=mango" http://localhost:1234/pipeline/create
+curl -X POST -d "name=mango" -d "command=npm info react" http://localhost:1234/pipeline/create
 ```
 
 create pipeline same tag:
