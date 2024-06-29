@@ -111,14 +111,15 @@ type PipelinesReply struct {
 
 // ReadPipelines Gets all pipeline files by the path passing.
 func (Cis *CiService) ReadPipelines(w http.ResponseWriter, r *http.Request) {
-	workspace, err := runner.NewWorkSpace(r.FormValue("path"))
+	name := r.FormValue("name")
+	workspace, err := runner.NewWorkSpace(name)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	pipeline, err := runner.NewPipeline(&runner.PipelineArgs{
-		Tag:  r.FormValue("tag"),
+		Tag:  name,
 		Path: workspace.CWD,
 	})
 	if err != nil {

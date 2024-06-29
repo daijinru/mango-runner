@@ -117,13 +117,6 @@ func (pip *Pipeline) ReadDir() ([]string, error) {
 		}
 		filenames = append(filenames, file.Name())
 	}
-	sort.Slice(filenames, func(i, j int) bool {
-		file1 := filepath.Join(pip.Directory, filenames[i])
-		file2 := filepath.Join(pip.Directory, filenames[j])
-		info1, _ := os.Stat(file1)
-		info2, _ := os.Stat(file2)
-		return info1.ModTime().Before(info2.ModTime())
-	})
 
 	filteredFilenames := make([]string, 0)
 	for _, filename := range filenames {
@@ -131,6 +124,14 @@ func (pip *Pipeline) ReadDir() ([]string, error) {
 			filteredFilenames = append(filteredFilenames, filename)
 		}
 	}
+
+	sort.Slice(filteredFilenames, func(i, j int) bool {
+		file1 := filepath.Join(pip.Directory, filenames[i])
+		file2 := filepath.Join(pip.Directory, filenames[j])
+		info1, _ := os.Stat(file1)
+		info2, _ := os.Stat(file2)
+		return info1.ModTime().Before(info2.ModTime())
+	})
 	return filteredFilenames, nil
 }
 

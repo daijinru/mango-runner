@@ -12,7 +12,7 @@ curl -X POST -d "name=mango" -d "filename=mango_20240629_113957.txt" http://loca
 
 pipeline list:
 ```bash
-curl -X POST -d "path=/datas/mango-runner" -d "tag=mango" http://localhost:1234/pipeline/list
+curl -X POST -d "name=mango" http://localhost:1234/pipeline/list
 ```
 
 Is service healthy?
