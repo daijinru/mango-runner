@@ -146,7 +146,7 @@ func (pip *Pipeline) Read(tag string, timestamp string) string {
 }
 
 func (pip *Pipeline) ReadFile(filename string) string {
-	filePath := filepath.Join(pip.Directory, filename)
+	filePath := filepath.Join(pip.Directory, filename+".txt")
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return ""
