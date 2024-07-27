@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/daijinru/mango-runner/runner"
 	"net/http"
+	"strconv"
 )
 
 type CiService struct {
@@ -167,6 +168,38 @@ func (cis *CiService) GitClone(w http.ResponseWriter, r *http.Request) {
 	}
 	reply := GitClientReply{
 		message: "success",
+	}
+	jsonData, err := json.Marshal(reply)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
+}
+
+func (cis *CiService) ReadMonitor(w http.ResponseWriter, r *http.Request) {
+	waitStr := r.FormValue("wait")
+	if waitStr == "" {
+		waitStr = "5"
+	}
+	wait, err := strconv.Atoi(waitStr)
+	if err != nil {
+		wait = 5
+	}
+	monitor := runner.NewSystemClient(wait)
+	states, err := monitor.Read()
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	statesByte, err := json.Marshal(states)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	statesStr := string(statesByte)
+	reply := PipelineReply{
+		Status:  "success",
+		Message: statesStr,
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {

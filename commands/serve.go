@@ -85,12 +85,21 @@ func NewServiceRpcStart() *command.Command {
 					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
 				}
 			})
+			handler7 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.Method {
+				case http.MethodPost:
+					ciService.ReadMonitor(w, r)
+				default:
+					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
+				}
+			})
 
 			http.Handle("/pipeline/create", loggingMiddleware(handler1))
 			http.Handle("/pipeline/stdout", loggingMiddleware(handler3))
 			http.Handle("/pipeline/list", loggingMiddleware(handler4))
 			http.Handle("/service/status", loggingMiddleware(handler5))
 			http.Handle("/git/clone", loggingMiddleware(handler6))
+			http.Handle("/service/monitor", loggingMiddleware(handler7))
 
 			fmt.Println("🌏 Now listening at port: " + args[0])
 			fmt.Println(http.ListenAndServe(":"+args[0], nil))
