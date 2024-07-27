@@ -86,9 +86,9 @@ func (runner *Runner) Create() error {
 	if runner.Callback != "" {
 		err = runner.Pipeline.Callback(
 			runner.Callback,
-			"status", "1",
 			"endTime", time.Now().Format("2006-01-02 15:04:05"),
 			"startTime", startTime,
+			"filename", runner.Pipeline.Filename,
 		)
 		if err != nil {
 			return err
