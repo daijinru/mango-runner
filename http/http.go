@@ -10,9 +10,10 @@ import (
 type CiService struct {
 }
 
-type PipelineReply struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
+type HttpResponse[T any] struct {
+	Status  int     `json:"status"`
+	Message *string `json:"message,omitempty"`
+	Data    *T      `json:"data,omitempty"`
 }
 
 // CreatePipeline Path parameter passing that service will switch to the path,
@@ -48,9 +49,10 @@ func (CiS *CiService) CreatePipeline(w http.ResponseWriter, r *http.Request) {
 		runner.Complete()
 	}()
 
-	reply := PipelineReply{
-		Status:  "success",
-		Message: runner.Pipeline.Filename,
+	reply := HttpResponse[string]{
+		Status: 200,
+		//Message: runner.Pipeline.Filename,
+		Data: &runner.Pipeline.Filename,
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {
@@ -79,9 +81,10 @@ func (Cis *CiService) ReadPipeline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reply := PipelineReply{
-		Status:  "success",
-		Message: pipeline.ReadFile(r.FormValue("filename")),
+	filename := pipeline.ReadFile(r.FormValue("filename"))
+	reply := HttpResponse[string]{
+		Status: 200,
+		Data:   &filename,
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {
@@ -92,9 +95,8 @@ func (Cis *CiService) ReadPipeline(w http.ResponseWriter, r *http.Request) {
 }
 
 func (Cis *CiService) ReadServiceStatus(w http.ResponseWriter, r *http.Request) {
-	reply := PipelineReply{
-		Status:  "success",
-		Message: "true",
+	reply := &HttpResponse[any]{
+		Status: 200,
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {
@@ -134,11 +136,16 @@ func (Cis *CiService) ReadPipelines(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reply := PipelinesReply{
+	pipelinesR := PipelinesReply{
 		Total:     len(filenames),
 		Tag:       r.FormValue("tag"),
 		Filenames: filenames,
 	}
+	reply := HttpResponse[PipelinesReply]{
+		Status: 200,
+		Data:   &pipelinesR,
+	}
+
 	jsonData, err := json.Marshal(reply)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -166,8 +173,8 @@ func (cis *CiService) GitClone(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	reply := GitClientReply{
-		message: "success",
+	reply := HttpResponse[any]{
+		Status: 200,
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {
@@ -197,9 +204,9 @@ func (cis *CiService) ReadMonitor(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	statesStr := string(statesByte)
-	reply := PipelineReply{
-		Status:  "success",
-		Message: statesStr,
+	reply := HttpResponse[string]{
+		Status: 200,
+		Data:   &statesStr,
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {
