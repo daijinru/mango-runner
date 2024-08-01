@@ -39,67 +39,79 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// RouteConfig ServiceFunc receives ResponseWriter and Request and no need to return
+type RouteConfig struct {
+	Path        string
+	Method      string
+	ServiceFunc func(w http.ResponseWriter, r *http.Request)
+}
+
+func createRouteHandler(config RouteConfig) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == config.Method {
+			config.ServiceFunc(w, r)
+		} else {
+			http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+}
+
 func NewServiceRpcStart() *command.Command {
 	return &command.Command{
 		Use:  "start",
 		Args: command.ExactArgs(1),
 		RunE: func(cmd *command.Command, args []string) error {
 			ciService := &httpService.CiService{}
-			handler1 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				switch r.Method {
-				case http.MethodPost:
-					ciService.CreatePipeline(w, r)
-				default:
-					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
-				}
-			})
-			handler3 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				switch r.Method {
-				case http.MethodPost:
-					ciService.ReadPipeline(w, r)
-				default:
-					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
-				}
-			})
-			handler4 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				switch r.Method {
-				case http.MethodPost:
-					ciService.ReadPipelines(w, r)
-				default:
-					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
-				}
-			})
-			handler5 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				switch r.Method {
-				case http.MethodPost:
-					ciService.ReadServiceStatus(w, r)
-				default:
-					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
-				}
-			})
-			handler6 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				switch r.Method {
-				case http.MethodPost:
-					ciService.GitClone(w, r)
-				default:
-					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
-				}
-			})
-			handler7 := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				switch r.Method {
-				case http.MethodPost:
-					ciService.ReadMonitor(w, r)
-				default:
-					http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
-				}
-			})
 
-			http.Handle("/pipeline/create", loggingMiddleware(handler1))
-			http.Handle("/pipeline/stdout", loggingMiddleware(handler3))
-			http.Handle("/pipeline/list", loggingMiddleware(handler4))
-			http.Handle("/service/status", loggingMiddleware(handler5))
-			http.Handle("/git/clone", loggingMiddleware(handler6))
-			http.Handle("/service/monitor", loggingMiddleware(handler7))
+			routes := []RouteConfig{
+				{
+					Path:   "/pipeline/create",
+					Method: http.MethodPost,
+					ServiceFunc: func(w http.ResponseWriter, r *http.Request) {
+						ciService.CreatePipeline(w, r)
+					},
+				},
+				{
+					Path:   "/pipeline/stdout",
+					Method: http.MethodPost,
+					ServiceFunc: func(w http.ResponseWriter, r *http.Request) {
+						ciService.ReadPipeline(w, r)
+					},
+				},
+				{
+					Path:   "/pipeline/list",
+					Method: http.MethodPost,
+					ServiceFunc: func(w http.ResponseWriter, r *http.Request) {
+						ciService.ReadPipelines(w, r)
+					},
+				},
+				{
+					Path:   "/service/status",
+					Method: http.MethodPost,
+					ServiceFunc: func(w http.ResponseWriter, r *http.Request) {
+						ciService.ReadServiceStatus(w, r)
+					},
+				},
+				{
+					Path:   "/git/clone",
+					Method: http.MethodPost,
+					ServiceFunc: func(w http.ResponseWriter, r *http.Request) {
+						ciService.GitClone(w, r)
+					},
+				},
+				{
+					Path:   "/service/monitor",
+					Method: http.MethodPost,
+					ServiceFunc: func(w http.ResponseWriter, r *http.Request) {
+						ciService.ReadMonitor(w, r)
+					},
+				},
+			}
+
+			for _, route := range routes {
+				handler := createRouteHandler(route)
+				http.Handle(route.Path, loggingMiddleware(handler))
+			}
 
 			fmt.Println("🌏 Now listening at port: " + args[0])
 			fmt.Println(http.ListenAndServe(":"+args[0], nil))
