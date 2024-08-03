@@ -39,3 +39,7 @@ mango-runner
 # user private
 .private
 .private/**/*
+
+# ide
+.idea
+.idea/**/*

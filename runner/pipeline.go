@@ -2,16 +2,13 @@ package runner
 
 import (
 	"fmt"
-	"io"
-	"net/http"
+	"github.com/daijinru/mango-runner/utils"
 	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/daijinru/mango-runner/utils"
 )
 
 type Pipeline struct {
@@ -155,36 +152,10 @@ func (pip *Pipeline) ReadFile(filename string) string {
 }
 
 func (pip *Pipeline) Callback(urlStr string, newQueries ...string) error {
-	decodedURL, err := url.QueryUnescape(urlStr)
+	respStr, err := utils.SendCallbackWithHttp(urlStr, newQueries)
 	if err != nil {
 		return err
 	}
-
-	parsedURL, err := url.Parse(decodedURL)
-	if err != nil {
-		return err
-	}
-
-	queries := parsedURL.Query()
-	for i := 0; i < len(newQueries); i += 2 {
-		key := newQueries[i]
-		value := newQueries[i+1]
-		queries.Add(key, value)
-	}
-
-	parsedURL.RawQuery = queries.Encode()
-
-	resp, err := http.Get(parsedURL.String())
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	bodyStr := string(body)
-	pip.WriteInfo(bodyStr)
+	pip.WriteInfo(respStr)
 	return nil
 }
