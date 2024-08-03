@@ -160,11 +160,12 @@ type GitClientReply struct {
 
 func (cis *CiService) GitClone(w http.ResponseWriter, r *http.Request) {
 	gitClient, err := runner.NewGitClient(&runner.GitClientArgs{
-		Name:   r.FormValue("name"),
-		Repo:   r.FormValue("repo"),
-		Branch: r.FormValue("branch"),
-		User:   r.FormValue("user"),
-		Pwd:    r.FormValue("pwd"),
+		Name:     r.FormValue("name"),
+		Repo:     r.FormValue("repo"),
+		Branch:   r.FormValue("branch"),
+		User:     r.FormValue("user"),
+		Pwd:      r.FormValue("pwd"),
+		Callback: r.FormValue("callback"),
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

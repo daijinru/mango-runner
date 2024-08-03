@@ -2,6 +2,7 @@ package runner
 
 import (
 	"fmt"
+	"github.com/daijinru/mango-runner/utils"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
@@ -15,11 +16,12 @@ type GitClient struct {
 }
 
 type GitClientArgs struct {
-	Name   string `json:"Name"`
-	Repo   string `json:"Repo"`
-	Branch string `json:"Branch"`
-	User   string `json:"User"`
-	Pwd    string `json:"Pwd"`
+	Name     string `json:"Name"`
+	Repo     string `json:"Repo"`
+	Branch   string `json:"Branch"`
+	User     string `json:"User"`
+	Pwd      string `json:"Pwd"`
+	Callback string `json:"callback"`
 }
 
 func NewGitClient(args *GitClientArgs) (*GitClient, error) {
@@ -66,6 +68,18 @@ func (gitClient *GitClient) Clone() error {
 	if err != nil {
 		return err
 	}
-	gitClient.Logger.Warn(fmt.Sprintf("clone completed! [%s]", status))
+	callback := gitClient.Args.Callback
+	respStr := ""
+	if callback != "" {
+		newQueries := []string{"git_status", status.String()}
+		respStr, err = utils.SendCallbackWithHttp(
+			callback,
+			newQueries,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	gitClient.Logger.Info(fmt.Sprintf("cloned message: [%s]", respStr))
 	return nil
 }
