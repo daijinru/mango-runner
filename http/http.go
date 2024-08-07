@@ -11,9 +11,9 @@ type CiService struct {
 }
 
 type HttpResponse[T any] struct {
-	Status  int     `json:"status"`
-	Message *string `json:"message,omitempty"`
-	Data    *T      `json:"data,omitempty"`
+	Status  int    `json:"status"`
+	Message string `json:"message,omitempty"`
+	Data    *T     `json:"data,omitempty"`
 }
 
 // CreatePipeline Path parameter passing that service will switch to the path,
@@ -96,7 +96,8 @@ func (Cis *CiService) ReadPipeline(w http.ResponseWriter, r *http.Request) {
 
 func (Cis *CiService) ReadServiceStatus(w http.ResponseWriter, r *http.Request) {
 	reply := &HttpResponse[any]{
-		Status: 200,
+		Status:  200,
+		Message: "success",
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {
@@ -152,10 +153,6 @@ func (Cis *CiService) ReadPipelines(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonData)
-}
-
-type GitClientReply struct {
-	message string `json:"message"`
 }
 
 func (cis *CiService) GitClone(w http.ResponseWriter, r *http.Request) {
