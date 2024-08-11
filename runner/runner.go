@@ -82,6 +82,8 @@ func (runner *Runner) Create() error {
 		runner.Logger.Warn(err.Error())
 		return err
 	}
+	// Temporary fix, if it is not unlock, the next task will not be executed after send Callback below.
+	runner.Complete()
 
 	if runner.Callback != "" {
 		err = runner.Pipeline.Callback(
