@@ -96,6 +96,7 @@ func (runner *Runner) Create() error {
 			return err
 		}
 	}
+	defer runner.Pipeline.CloseFile()
 	return nil
 }
 
@@ -104,6 +105,5 @@ func (runner *Runner) Complete() error {
 	if err != nil {
 		return err
 	}
-	defer runner.Pipeline.CloseFile()
 	return nil
 }

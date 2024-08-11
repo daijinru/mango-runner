@@ -152,6 +152,7 @@ func (pip *Pipeline) ReadFile(filename string) string {
 }
 
 func (pip *Pipeline) Callback(urlStr string, newQueries ...string) error {
+	pip.WriteInfo("send callback to: " + urlStr + " with new queries: " + strings.Join(newQueries, ",") + "\n")
 	respStr, err := utils.SendCallbackWithHttp(urlStr, newQueries)
 	if err != nil {
 		return err
