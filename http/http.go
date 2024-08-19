@@ -46,7 +46,7 @@ func (CiS *CiService) CreatePipeline(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			runner.Logger.Warn(err.Error())
 		}
-		runner.Complete()
+		//runner.Complete()
 	}()
 
 	reply := HttpResponse[string]{
@@ -162,7 +162,7 @@ func (cis *CiService) GitClone(w http.ResponseWriter, r *http.Request) {
 		Branch:   r.FormValue("branch"),
 		User:     r.FormValue("user"),
 		Pwd:      r.FormValue("pwd"),
-		Callback: r.FormValue("callback"),
+		Callback: r.FormValue("callbackUrl"),
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
