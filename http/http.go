@@ -167,12 +167,14 @@ func (cis *CiService) GitClone(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	err = gitClient.Clone()
+	err = gitClient.DispatchIfExisted()
+	reply := HttpResponse[any]{}
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-	reply := HttpResponse[any]{
-		Status: 200,
+		reply.Status = 400
+		reply.Message = err.Error()
+	} else {
+		reply.Status = 200
+		reply.Message = "clone success!"
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {
