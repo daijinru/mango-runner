@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"bufio"
 
 	"github.com/daijinru/mango-runner/utils"
 )
@@ -152,6 +153,35 @@ func (pip *Pipeline) ReadFile(filename string) string {
 		return ""
 	}
 	return string(content)
+}
+
+func (pip *Pipeline) ReadFileByIndex(filename string, start, size int) string {
+	filePath := filepath.Join(pip.Directory, filename+".txt")
+	file, err := os.Open(filePath)
+	if err != nil {
+		return ""
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	lines := []string{}
+	lineNum := 0
+
+	for scanner.Scan() {
+		lineNum++
+		if lineNum >= start && lineNum < start+size {
+			lines = append(lines, scanner.Text())
+		}
+		if lineNum >= start+size {
+			break
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return ""
+	}
+
+	return strings.Join(lines, "\n")
 }
 
 func (pip *Pipeline) Callback(urlStr string, newQueries ...string) error {

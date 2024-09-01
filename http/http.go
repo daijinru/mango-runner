@@ -81,10 +81,28 @@ func (Cis *CiService) ReadPipeline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filename := pipeline.ReadFile(r.FormValue("filename"))
+	var content string
+	start := r.FormValue("start")
+	size := r.FormValue("size")
+	if start != "" && size != "" {
+		startInt, err := strconv.Atoi(start)
+		if err != nil {
+			http.Error(w, "invalid start param", http.StatusBadRequest)
+			return
+		}
+		sizeInt, err := strconv.Atoi(size)
+		if err != nil {
+			http.Error(w, "invalid size param", http.StatusBadRequest)
+			return
+		}
+		content = pipeline.ReadFileByIndex(r.FormValue("filename"), startInt, sizeInt)
+	} else {
+		content = pipeline.ReadFile(r.FormValue("filename"))
+	}
+
 	reply := HttpResponse[string]{
 		Status: 200,
-		Data:   &filename,
+		Data:   &content,
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {
