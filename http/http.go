@@ -11,9 +11,9 @@ type CiService struct {
 }
 
 type HttpResponse[T any] struct {
-	Status  int     `json:"status"`
-	Message *string `json:"message,omitempty"`
-	Data    *T      `json:"data,omitempty"`
+	Status  int    `json:"status"`
+	Message string `json:"message,omitempty"`
+	Data    *T     `json:"data,omitempty"`
 }
 
 // CreatePipeline Path parameter passing that service will switch to the path,
@@ -46,7 +46,7 @@ func (CiS *CiService) CreatePipeline(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			runner.Logger.Warn(err.Error())
 		}
-		runner.Complete()
+		//runner.Complete()
 	}()
 
 	reply := HttpResponse[string]{
@@ -114,7 +114,8 @@ func (Cis *CiService) ReadPipeline(w http.ResponseWriter, r *http.Request) {
 
 func (Cis *CiService) ReadServiceStatus(w http.ResponseWriter, r *http.Request) {
 	reply := &HttpResponse[any]{
-		Status: 200,
+		Status:  200,
+		Message: "success",
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {
@@ -172,27 +173,26 @@ func (Cis *CiService) ReadPipelines(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonData)
 }
 
-type GitClientReply struct {
-	message string `json:"message"`
-}
-
 func (cis *CiService) GitClone(w http.ResponseWriter, r *http.Request) {
 	gitClient, err := runner.NewGitClient(&runner.GitClientArgs{
-		Name:   r.FormValue("name"),
-		Repo:   r.FormValue("repo"),
-		Branch: r.FormValue("branch"),
-		User:   r.FormValue("user"),
-		Pwd:    r.FormValue("pwd"),
+		Name:     r.FormValue("name"),
+		Repo:     r.FormValue("repo"),
+		Branch:   r.FormValue("branch"),
+		User:     r.FormValue("user"),
+		Pwd:      r.FormValue("pwd"),
+		Callback: r.FormValue("callbackUrl"),
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	err = gitClient.Clone()
+	err = gitClient.DispatchIfExisted()
+	reply := HttpResponse[any]{}
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-	reply := HttpResponse[any]{
-		Status: 200,
+		reply.Status = 400
+		reply.Message = err.Error()
+	} else {
+		reply.Status = 200
+		reply.Message = "clone success!"
 	}
 	jsonData, err := json.Marshal(reply)
 	if err != nil {

@@ -2,6 +2,9 @@ package utils
 
 import (
 	"github.com/google/uuid"
+	"io"
+	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -25,4 +28,35 @@ func ConvertArrayToStr(arr []string) string {
 		merged += arr[i]
 	}
 	return merged
+}
+
+// SendCallbackWithHttp
+// send callback return with new Queries,
+// and with the original queries.
+func SendCallbackWithHttp(urlStr string, newQueries []string) (string, error) {
+	decodedURL, err := url.QueryUnescape(urlStr)
+	if err != nil {
+		return "", err
+	}
+	parsedURL, err := url.Parse(decodedURL)
+	if err != nil {
+		return "", err
+	}
+	originQueries := parsedURL.Query()
+	for i := 0; i < len(newQueries); i += 2 {
+		key := newQueries[i]
+		value := newQueries[i+1]
+		originQueries.Add(key, value)
+	}
+	parsedURL.RawQuery = originQueries.Encode()
+	resp, err := http.Get(parsedURL.String())
+	if err != nil {
+		return "", err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	bodyStr := string(body)
+	return bodyStr, err
 }

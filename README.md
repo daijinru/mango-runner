@@ -2,6 +2,7 @@
 
 ## Todo
 
+- [x] [081401] Git update of repo exists.
 - [x] [061501] Provide a http call for cloning from the Git repo/branch. 
 - [x] [062101] Refactor methods basis on Git Clone.
 
